@@ -1,0 +1,8 @@
+{
+  // Cloudflare Pages project config. `npm run deploy` (or the deploy workflow)
+  // uploads the built dist/ folder here.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "count-ludo",
+  "compatibility_date": "2025-01-01",
+  "pages_build_output_dir": "dist",
+}

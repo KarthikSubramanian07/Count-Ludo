@@ -1,0 +1,49 @@
+name: Deploy to Cloudflare Pages
+
+# Deploys on every push to main, but only once the two repository secrets exist,
+# so this workflow stays green (skipped) until you opt in.
+#
+# To enable, add these repo secrets (Settings > Secrets and variables > Actions):
+#   CLOUDFLARE_API_TOKEN    a token with the "Cloudflare Pages: Edit" permission
+#   CLOUDFLARE_ACCOUNT_ID   your account id, from the Cloudflare dashboard URL
+#
+# Prefer no CI at all? `npm run deploy` from your machine after `npx wrangler
+# login` does the same thing.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    env:
+      HAS_CREDENTIALS: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.HAS_CREDENTIALS == 'true'
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_CREDENTIALS == 'true'
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+        if: env.HAS_CREDENTIALS == 'true'
+
+      - run: npm run build
+        if: env.HAS_CREDENTIALS == 'true'
+
+      - name: Publish to Cloudflare Pages
+        if: env.HAS_CREDENTIALS == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=count-ludo
+
+      - name: Note when skipped
+        if: env.HAS_CREDENTIALS != 'true'
+        run: echo "Cloudflare secrets not set; skipping deploy. See this file's header to enable."
