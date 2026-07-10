@@ -337,6 +337,14 @@ button {
   opacity: 0.7;
   font-size: 0.8rem;
 }
+.coffee-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.coffee-link:hover {
+  text-decoration: underline;
+}
 
 /* ---- Color dots (shared) ------------------------------------------------ */
 

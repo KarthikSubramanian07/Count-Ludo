@@ -4,7 +4,7 @@
 
 **Ludo, online and clean. Roll, race, win. No ads, no downloads, no signup.**
 
-[Play now](https://count-ludo.pages.dev) · [Report a bug](https://github.com/KarthikSubramanian07/Count-Ludo/issues) · [How the dice work](#is-the-dice-really-fair)
+[Play now](https://count-ludo.pages.dev) · [Report a bug](https://github.com/KarthikSubramanian07/Count-Ludo/issues) · [How the dice work](#is-the-dice-really-fair) · [Buy me a coffee](https://buymeacoffee.com/winnerkarthik)
 
 </div>
 
@@ -75,6 +75,10 @@ tests/        vitest suite for the engine (the part that must never break)
 - **SVG board** drawn from a 15x15 grid, so it stays crisp at any size.
 - **Vitest** for the engine, run in CI on every push.
 - **Cloudflare Pages** for hosting, which is where the "$0 to run" comes from.
+
+## Keeping it free
+
+Count Ludo has no ads and never will, so there is no revenue to speak of and there does not need to be. If you'd still like to chip in toward hosting and the next feature, there is a [Buy Me a Coffee](https://buymeacoffee.com/winnerkarthik) link. Entirely optional. The game stays free either way.
 
 ## Contributing
 

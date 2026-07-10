@@ -140,6 +140,22 @@ export function buildHome(ctx: HomeContext): HTMLElement {
         { class: 'muted' },
         'Ludo descends from the ancient game of Pachisi and is in the public domain. ',
         'Count Ludo is an original, open-source take on it.'
+      ),
+      h(
+        'p',
+        {},
+        'Enjoying it? ',
+        h(
+          'a',
+          {
+            href: 'https://buymeacoffee.com/winnerkarthik',
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            class: 'coffee-link',
+          },
+          'Buy me a coffee'
+        ),
+        ', entirely optional, the game stays free either way.'
       )
     )
   );
