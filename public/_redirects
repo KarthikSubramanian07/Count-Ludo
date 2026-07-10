@@ -1,0 +1,3 @@
+# Single-page app: serve index.html for any unknown path (static assets are
+# matched first, so this only catches real 404s).
+/*  /index.html  200

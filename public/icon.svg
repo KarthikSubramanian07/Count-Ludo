@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Count Ludo">
+  <rect width="512" height="512" rx="112" fill="#12131a" />
+  <g transform="translate(96 96)">
+    <rect width="320" height="320" rx="60" fill="#0d0e14" />
+    <polygon points="32,32 288,32 160,160" fill="#30a46c" />
+    <polygon points="288,32 288,288 160,160" fill="#f5b301" />
+    <polygon points="288,288 32,288 160,160" fill="#3e63dd" />
+    <polygon points="32,288 32,32 160,160" fill="#e5484d" />
+    <circle cx="160" cy="160" r="44" fill="#12131a" />
+    <circle cx="160" cy="160" r="19" fill="#eef0f6" />
+  </g>
+</svg>

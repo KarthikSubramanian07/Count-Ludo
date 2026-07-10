@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Count Ludo">
+  <rect width="1200" height="630" fill="#0d0e14" />
+  <rect width="1200" height="630" fill="url(#g)" opacity="0.12" />
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e5484d" />
+      <stop offset="0.35" stop-color="#f5b301" />
+      <stop offset="0.7" stop-color="#30a46c" />
+      <stop offset="1" stop-color="#3e63dd" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(96 155)">
+    <rect width="320" height="320" rx="60" fill="#161821" />
+    <polygon points="32,32 288,32 160,160" fill="#30a46c" />
+    <polygon points="288,32 288,288 160,160" fill="#f5b301" />
+    <polygon points="288,288 32,288 160,160" fill="#3e63dd" />
+    <polygon points="32,288 32,32 160,160" fill="#e5484d" />
+    <circle cx="160" cy="160" r="44" fill="#161821" />
+    <circle cx="160" cy="160" r="19" fill="#eef0f6" />
+  </g>
+  <g transform="translate(470 240)" fill="#eef0f6" font-family="system-ui, sans-serif">
+    <text x="0" y="0" font-size="96" font-weight="800" letter-spacing="-3">Count Ludo</text>
+    <text x="0" y="66" font-size="38" fill="#9aa0b4" font-weight="600">Play Ludo online, free and clean.</text>
+    <text x="0" y="120" font-size="30" fill="#9aa0b4">No ads. No downloads. No signup.</text>
+  </g>
+</svg>

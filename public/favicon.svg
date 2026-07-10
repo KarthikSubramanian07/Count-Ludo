@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Count Ludo">
+  <rect width="64" height="64" rx="14" fill="#12131a" />
+  <g transform="translate(12 12)">
+    <rect width="40" height="40" rx="8" fill="#0d0e14" />
+    <!-- four home triangles meeting in the middle -->
+    <polygon points="4,4 36,4 20,20" fill="#30a46c" />
+    <polygon points="36,4 36,36 20,20" fill="#f5b301" />
+    <polygon points="36,36 4,36 20,20" fill="#3e63dd" />
+    <polygon points="4,36 4,4 20,20" fill="#e5484d" />
+    <circle cx="20" cy="20" r="5.5" fill="#12131a" />
+    <circle cx="20" cy="20" r="2.4" fill="#eef0f6" />
+  </g>
+</svg>
