@@ -6,6 +6,7 @@ import type { Color, Difficulty } from '../../engine/types.ts';
 import type { Prefs, Stats } from '../storage.ts';
 import type { Theme } from '../theme.ts';
 import { h, clear, cap } from '../dom.ts';
+import { shareGame } from '../share.ts';
 
 export interface Seat {
   color: Color;
@@ -91,6 +92,22 @@ export function buildHome(ctx: HomeContext): HTMLElement {
   );
   resumeBtn.onclick = () => ctx.onResume();
 
+  const shareNote = h('span', { class: 'share-note', 'aria-live': 'polite' });
+  const shareBtn = h(
+    'button',
+    { class: 'btn btn-ghost share-btn', type: 'button' },
+    '\u{1F517} Share with friends'
+  );
+  shareBtn.onclick = async () => {
+    const result = await shareGame();
+    if (result.outcome === 'copied') {
+      shareNote.textContent = 'Link copied!';
+      window.setTimeout(() => (shareNote.textContent = ''), 2500);
+    } else if (result.outcome === 'unsupported') {
+      shareNote.textContent = window.location.href;
+    }
+  };
+
   return h(
     'main',
     { class: 'home' },
@@ -109,7 +126,8 @@ export function buildHome(ctx: HomeContext): HTMLElement {
         'Play Ludo online free, right in your browser, against smart bots or friends ',
         'passing one device. No signup, no installs, no nagging. Just the classic ',
         'race to get all four tokens home, the way it should be.'
-      )
+      ),
+      h('div', { class: 'share-row' }, shareBtn, shareNote)
     ),
     h(
       'section',

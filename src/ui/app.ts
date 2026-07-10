@@ -403,8 +403,10 @@ export class App {
         'span',
         {},
         player.isHuman
-          ? `${player.name}, your roll`
-          : `${player.name} is thinking`
+          ? player.name === 'You'
+            ? 'Your turn'
+            : `${player.name}'s turn`
+          : `${player.name} thinking…`
       )
     );
     this.die.show(game.state.die);
