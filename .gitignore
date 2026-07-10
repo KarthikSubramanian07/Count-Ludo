@@ -6,3 +6,9 @@ coverage
 .DS_Store
 .vite
 .wrangler
+
+# Impeccable is a local design-assist tool for the AI harness, not part of
+# the shipped game. Installed via `npx impeccable install`; not committed so
+# the public repo stays scoped to Count Ludo itself.
+.github/skills
+.github/hooks

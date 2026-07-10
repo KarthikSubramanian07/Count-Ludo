@@ -1,10 +1,17 @@
-// The theme engine. A theme is pure data: a bag of CSS custom properties. To
-// add one, drop another entry in THEMES and it shows up in the picker. The
+// The theme engine. A theme is pure data: a bag of CSS custom properties. The
 // engine just writes those variables onto the document root and remembers the
 // choice.
 //
-// Player colors (red/green/yellow/blue) stay recognizably themselves across
-// themes; what changes is the room they play in.
+// This is one committed brand system, not a shelf of arbitrary palettes: a
+// warm clay accent (hue 35) with every neutral tinted toward that same hue,
+// shown in a light register and a dark one. Dark mode is not an inverted
+// light mode: depth comes from a lighter-surface elevation scale, not
+// shadows, and the accent desaturates slightly so it doesn't glow.
+//
+// Player colors (red/green/yellow/blue) are functional, not decorative: Ludo
+// needs exactly four distinguishable pieces. They stay constant across both
+// registers, tuned toward the same warm, muted family as the rest of the
+// system instead of stock crayon-box primaries.
 
 export interface Theme {
   id: string;
@@ -14,99 +21,64 @@ export interface Theme {
   vars: Record<string, string>;
 }
 
-const PLAYER_COLORS = {
-  '--red': '#e5484d',
-  '--red-soft': '#f4a6a8',
-  '--green': '#30a46c',
-  '--green-soft': '#9fdcbd',
-  '--yellow': '#f5b301',
-  '--yellow-soft': '#f7d97a',
-  '--blue': '#3e63dd',
-  '--blue-soft': '#a3b4f0',
+const PIECES = {
+  '--red': '#c14a3d',
+  '--red-soft': '#e3aca3',
+  '--green': '#3e8a5c',
+  '--green-soft': '#a7cdb4',
+  '--yellow': '#c99332',
+  '--yellow-soft': '#e3c48c',
+  '--blue': '#3d6e9e',
+  '--blue-soft': '#a4c0d8',
 };
 
 export const THEMES: Theme[] = [
   {
-    id: 'midnight',
-    label: 'Midnight',
-    swatch: '#12131a',
-    vars: {
-      ...PLAYER_COLORS,
-      '--bg': '#0d0e14',
-      '--surface': '#161821',
-      '--surface-2': '#1e2130',
-      '--text': '#eef0f6',
-      '--text-dim': '#9aa0b4',
-      '--accent': '#6d8cff',
-      '--border': '#2a2e3f',
-      '--board-bg': '#1a1d29',
-      '--cell': '#f3f4f8',
-      '--cell-line': '#d7dae6',
-      '--cell-safe': '#e7e9f2',
-      '--shadow': '0 10px 40px rgba(0,0,0,0.45)',
-    },
-  },
-  {
     id: 'daylight',
     label: 'Daylight',
-    swatch: '#f4f1ea',
+    swatch: '#faf9f7',
     vars: {
-      ...PLAYER_COLORS,
-      '--bg': '#f4f1ea',
-      '--surface': '#ffffff',
-      '--surface-2': '#f3f0e7',
-      '--text': '#20242e',
-      '--text-dim': '#6b7180',
-      '--accent': '#3e63dd',
-      '--border': '#e3ded2',
-      '--board-bg': '#efe9dc',
-      '--cell': '#ffffff',
-      '--cell-line': '#e0dccf',
-      '--cell-safe': '#f0ece0',
-      '--shadow': '0 12px 40px rgba(60,50,30,0.14)',
+      ...PIECES,
+      '--bg': '#fdfcfb',
+      '--surface': '#f8f6f3',
+      '--surface-2': '#f0ede7',
+      '--text': '#2b2622',
+      '--text-dim': '#6b6259',
+      '--border': '#e2ddd4',
+      '--accent': '#a6472e',
+      '--on-accent': '#fdfcfb',
+      '--accent-soft': '#f3e2da',
+      '--board-bg': '#ece6dc',
+      '--cell': '#fdfcfb',
+      '--cell-line': '#ddd6c9',
+      '--cell-safe': '#f1ebdf',
+      '--shadow': '0 12px 32px rgba(60, 45, 30, 0.1)',
     },
   },
   {
-    id: 'sunset',
-    label: 'Sunset',
-    swatch: '#2a1730',
+    id: 'midnight',
+    label: 'Midnight',
+    swatch: '#1c1815',
     vars: {
-      ...PLAYER_COLORS,
-      '--red': '#ff5c72',
-      '--yellow': '#ffb648',
-      '--bg': '#1c1024',
-      '--surface': '#291733',
-      '--surface-2': '#361f43',
-      '--text': '#fbeef6',
-      '--text-dim': '#c39ec0',
-      '--accent': '#ff8fab',
-      '--border': '#432a52',
-      '--board-bg': '#2a1836',
-      '--cell': '#fdf3f8',
-      '--cell-line': '#eccfe0',
-      '--cell-safe': '#f6e4ef',
-      '--shadow': '0 12px 44px rgba(20,5,25,0.5)',
-    },
-  },
-  {
-    id: 'mint',
-    label: 'Mint',
-    swatch: '#0f3b34',
-    vars: {
-      ...PLAYER_COLORS,
-      '--blue': '#2f81c9',
-      '--bg': '#0c1f1c',
-      '--surface': '#12302a',
-      '--surface-2': '#173d35',
-      '--text': '#eafaf3',
-      '--text-dim': '#8fc4b4',
-      '--accent': '#4fd1a5',
-      '--border': '#1f4a41',
-      '--board-bg': '#123029',
-      '--cell': '#f2fbf7',
-      '--cell-line': '#cfe9df',
-      '--cell-safe': '#e3f5ec',
-      '--shadow': '0 12px 44px rgba(0,20,15,0.45)',
+      ...PIECES,
+      '--red': '#d97662',
+      '--green': '#5da97e',
+      '--yellow': '#dcac52',
+      '--blue': '#6d97c2',
+      '--bg': '#191510',
+      '--surface': '#211c16',
+      '--surface-2': '#2a231c',
+      '--text': '#f2ede6',
+      '--text-dim': '#a89c8d',
+      '--border': '#3a3129',
+      '--accent': '#d97757',
+      '--on-accent': '#191510',
+      '--accent-soft': '#3a2a20',
+      '--board-bg': '#241e17',
+      '--cell': '#f2ede6',
+      '--cell-line': '#d8cfc0',
+      '--cell-safe': '#e7ded0',
+      '--shadow': '0 16px 40px rgba(0, 0, 0, 0.5)',
     },
   },
 ];
@@ -123,5 +95,5 @@ export function applyTheme(id: string): void {
   }
   root.dataset.theme = theme.id;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', theme.vars['--bg'] ?? '#0d0e14');
+  if (meta) meta.setAttribute('content', theme.vars['--bg'] ?? '#fdfcfb');
 }

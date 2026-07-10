@@ -3,3 +3,5 @@ dev-dist
 coverage
 node_modules
 *.md
+.github/skills
+.github/hooks

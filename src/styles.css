@@ -1,13 +1,37 @@
-/* Count Ludo styles. One stylesheet, driven entirely by CSS variables the theme
-   engine sets on :root. Colors, surfaces, and shadows all flow from there, so a
-   new theme is a data change, not a CSS rewrite. */
+/* Count Ludo styles. One committed system: a warm clay accent, tinted warm
+   neutrals, and a serif/sans pairing for genuine display-vs-body contrast.
+   Colors live entirely in CSS variables the theme engine sets on :root, so a
+   new theme is a data change, not a CSS rewrite; the type scale and rhythm
+   below are fixed regardless of theme. */
 
 :root {
-  --font:
-    system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* One well-tuned sans carries the UI; a book serif carries display type.
+     Both are system stacks, so there's no webfont to host or load. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
+    sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+
+  /* Five sizes, ~1.333 ratio, fixed rem scale (this is app UI, not a
+     marketing page: fixed sizing gives the board layout spatial
+     predictability that fluid type would undermine). */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.5rem;
+  --text-xl: 2rem;
+  --text-2xl: 2.5rem;
+  /* The one deliberately fluid size: the home hero headline. Bounded well
+     under the 6rem ceiling so it never shouts. */
+  --text-hero: clamp(2.25rem, 5vw + 1rem, 3.75rem);
+
   --radius: 16px;
   --radius-sm: 10px;
   --maxw: 720px;
+
+  /* Ease-out only; nothing here overshoots past its resting value. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -21,10 +45,11 @@ body {
 }
 
 body {
-  font-family: var(--font);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
   transition:
@@ -40,7 +65,7 @@ h1,
 h2 {
   line-height: 1.15;
   margin: 0;
-  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 button {
@@ -58,9 +83,9 @@ button {
   padding: 0.7rem 1.1rem;
   font-weight: 600;
   transition:
-    transform 0.08s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
+    transform 0.08s var(--ease-out),
+    background 0.2s var(--ease-out),
+    border-color 0.2s var(--ease-out);
 }
 .btn:hover {
   border-color: var(--accent);
@@ -70,12 +95,12 @@ button {
 }
 .btn-lg {
   padding: 0.9rem 1.4rem;
-  font-size: 1.05rem;
+  font-size: var(--text-md);
 }
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .btn-ghost {
   background: transparent;
@@ -92,10 +117,10 @@ button {
   border-radius: 10px;
   width: 40px;
   height: 40px;
-  font-size: 1.05rem;
+  font-size: var(--text-md);
   display: grid;
   place-items: center;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s var(--ease-out);
 }
 .icon-btn:hover {
   border-color: var(--accent);
@@ -113,22 +138,14 @@ button {
 }
 
 .hero h1 {
-  font-size: clamp(2.4rem, 8vw, 3.6rem);
-  font-weight: 800;
-  background: linear-gradient(
-    120deg,
-    var(--red),
-    var(--yellow),
-    var(--green),
-    var(--blue)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  width: fit-content;
+  font-family: var(--font-serif);
+  font-size: var(--text-hero);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 .tagline {
-  font-size: 1.15rem;
+  font-size: var(--text-md);
   color: var(--text);
   margin: 0.5rem 0 0;
   font-weight: 600;
@@ -137,6 +154,7 @@ button {
   color: var(--text-dim);
   margin: 0.6rem 0 0;
   max-width: 60ch;
+  text-wrap: pretty;
 }
 
 .card {
@@ -147,7 +165,9 @@ button {
   box-shadow: var(--shadow);
 }
 .card h2 {
-  font-size: 1.2rem;
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 600;
   margin-bottom: 1rem;
 }
 
@@ -167,13 +187,13 @@ button {
   border-radius: 9px;
   font-weight: 600;
   transition:
-    background 0.2s ease,
-    color 0.2s ease;
+    background 0.2s var(--ease-out),
+    color 0.2s var(--ease-out);
 }
 .seg-btn.active {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .seat-list {
@@ -205,13 +225,13 @@ button {
   color: var(--text-dim);
   border-radius: 999px;
   padding: 0.3rem 0.7rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 .chip.active {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .select {
   border: 1px solid var(--border);
@@ -227,7 +247,7 @@ button {
 }
 .hint {
   color: var(--text-dim);
-  font-size: 0.86rem;
+  font-size: var(--text-sm);
   margin: 0.4rem 0 0;
 }
 
@@ -251,7 +271,7 @@ button {
   background: var(--surface-2);
   border: 1px solid var(--border);
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s var(--ease-out);
 }
 .toggle-track::after {
   content: '';
@@ -263,8 +283,8 @@ button {
   border-radius: 50%;
   background: var(--text-dim);
   transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+    transform 0.2s var(--ease-out),
+    background 0.2s var(--ease-out);
 }
 .toggle-input:checked + .toggle-track {
   background: var(--accent);
@@ -272,7 +292,7 @@ button {
 }
 .toggle-input:checked + .toggle-track::after {
   transform: translateX(18px);
-  background: #fff;
+  background: var(--on-accent);
 }
 .toggle-input:focus-visible + .toggle-track {
   outline: 2px solid var(--accent);
@@ -290,8 +310,8 @@ button {
   border-radius: 9px;
   border: 2px solid var(--border);
   transition:
-    transform 0.1s ease,
-    border-color 0.2s ease;
+    transform 0.15s var(--ease-out),
+    border-color 0.2s var(--ease-out);
 }
 .swatch.active {
   border-color: var(--accent);
@@ -321,21 +341,22 @@ button {
 }
 .stat b {
   display: block;
-  font-size: 1.4rem;
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
 }
 .stat span {
   color: var(--text-dim);
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
 }
 
 .home-footer {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   text-align: center;
 }
 .home-footer .muted {
-  opacity: 0.7;
-  font-size: 0.8rem;
+  opacity: 0.75;
+  font-size: var(--text-xs);
 }
 .coffee-link {
   color: var(--accent);
@@ -385,8 +406,9 @@ button {
   gap: 0.6rem;
 }
 .brand-mini {
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: var(--text-md);
   flex: 1;
 }
 .header-tools {
@@ -433,44 +455,38 @@ button {
 .btn-roll {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   min-width: 84px;
 }
 .message {
   flex-basis: 100%;
   color: var(--text-dim);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   min-height: 1.2em;
 }
 
 /* ---- Die ---------------------------------------------------------------- */
 
 .die-face {
-  fill: #fbfbfd;
-  stroke: rgba(0, 0, 0, 0.12);
+  fill: var(--cell);
+  stroke: var(--cell-line);
   stroke-width: 2;
 }
 .die-pip {
-  fill: #21232c;
+  fill: var(--text);
 }
 .die.rolling {
-  animation: die-wobble 0.45s ease;
+  animation: die-settle 0.5s var(--ease-out);
 }
-@keyframes die-wobble {
+@keyframes die-settle {
   0% {
-    transform: rotate(0) scale(1);
+    transform: rotate(0deg) scale(1);
   }
-  25% {
-    transform: rotate(-12deg) scale(1.08);
-  }
-  50% {
-    transform: rotate(10deg) scale(1.04);
-  }
-  75% {
-    transform: rotate(-6deg) scale(1.06);
+  30% {
+    transform: rotate(-8deg) scale(1.06);
   }
   100% {
-    transform: rotate(0) scale(1);
+    transform: rotate(0deg) scale(1);
   }
 }
 
@@ -533,17 +549,12 @@ button {
   fill: var(--text-dim);
   opacity: 0.5;
 }
-.star-red {
-  fill: rgba(255, 255, 255, 0.85);
-}
-.star-green {
-  fill: rgba(255, 255, 255, 0.85);
-}
-.star-yellow {
-  fill: rgba(255, 255, 255, 0.85);
-}
+.star-red,
+.star-green,
+.star-yellow,
 .star-blue {
-  fill: rgba(255, 255, 255, 0.85);
+  fill: var(--on-accent);
+  opacity: 0.9;
 }
 
 .home-tri {
@@ -551,10 +562,12 @@ button {
   stroke-width: 0.06;
 }
 
-/* ---- Tokens ------------------------------------------------------------- */
+/* ---- Tokens --------------------------------------------------------------
+
+Piece motion settles with a plain ease-out: no spring, no overshoot. */
 
 .token {
-  transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.5, 1);
+  transition: transform 0.32s var(--ease-out);
 }
 .token-body {
   stroke: rgba(0, 0, 0, 0.35);
@@ -600,12 +613,14 @@ button {
   padding: 1rem 1.1rem;
 }
 .fairness h2 {
-  font-size: 1rem;
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  font-weight: 600;
   margin-bottom: 0.4rem;
 }
 .fairness-note {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   margin: 0 0 0.8rem;
 }
 .log-list {
@@ -622,7 +637,7 @@ button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   padding: 0.25rem 0;
   border-bottom: 1px solid var(--border);
 }
@@ -632,7 +647,7 @@ button {
 }
 .log-note {
   color: var(--text-dim);
-  font-size: 0.82rem;
+  font-size: var(--text-xs);
 }
 
 /* ---- Win screen --------------------------------------------------------- */
@@ -647,22 +662,22 @@ button {
   text-align: center;
 }
 .win-hero h1 {
-  font-size: clamp(2rem, 7vw, 3rem);
-  font-weight: 800;
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 600;
 }
 .confetti {
-  font-size: 3rem;
-  animation: pop 0.6s ease;
+  font-size: var(--text-2xl);
+  animation: confetti-in 0.4s var(--ease-out);
 }
-@keyframes pop {
+@keyframes confetti-in {
   0% {
-    transform: scale(0);
-  }
-  70% {
-    transform: scale(1.3);
+    transform: scale(0.5);
+    opacity: 0;
   }
   100% {
     transform: scale(1);
+    opacity: 1;
   }
 }
 .standings {
@@ -685,7 +700,7 @@ button {
   border-radius: var(--radius-sm);
 }
 .medal {
-  font-size: 1.2rem;
+  font-size: var(--text-md);
   min-width: 1.6rem;
 }
 .rank-name {
@@ -693,11 +708,11 @@ button {
   flex: 1;
 }
 .you-tag {
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   padding: 0.1rem 0.4rem;
   border-radius: 6px;
 }

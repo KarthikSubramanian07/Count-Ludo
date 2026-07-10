@@ -33,7 +33,7 @@ export interface SavedGame {
 }
 
 const DEFAULT_PREFS: Prefs = {
-  theme: 'midnight',
+  theme: 'daylight',
   sound: true,
   blocking: false,
 };
