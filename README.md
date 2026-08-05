@@ -20,9 +20,11 @@ It runs entirely in your browser. There is no server, no database, no login, and
 - **Bots that actually think.** Three difficulty levels, from a bot that wanders to one that hunts your tokens and plays the odds.
 - **All the real rules.** Six to leave base, extra turns on a six (capped at three so nobody stalls), captures, safe squares, exact-count home entry, auto-pass when you are stuck. Optional blockades if you like it spicy.
 - **Dice you can trust.** Every roll comes from your browser's cryptographic randomness, and there is a live roll log so you can watch the numbers fall. More on that below.
-- **Four themes.** Midnight, Daylight, Sunset, and Mint. Switch mid-game.
-- **Plays offline.** Load it once and it works on a plane. Install it to your home screen if you want.
+- **Light and dark, done properly.** One committed design system in two registers, not a shelf of arbitrary color swaps. Switch mid-game.
+- **Plays offline.** Load it once and it works on a plane. Install it to your home screen if you want, on iOS and Android both.
 - **Sound, or silence.** Your call, remembered.
+- **Actually works on a phone.** Real touch targets, tested at iPhone and iPad sizes, not just resized in a desktop browser.
+- **One link, shareable.** Hit Share on the home screen to send it to whoever you're about to beat.
 
 ## Is the dice really fair?
 
@@ -47,7 +49,7 @@ The engine is pure. Hand it a game state and a move, get a new state back. It ne
 
 ## Running it locally
 
-You need [Node](https://nodejs.org) 20 or newer.
+You need [Node](https://nodejs.org) 22 or newer (Wrangler, the Cloudflare deploy CLI, requires it).
 
 ```bash
 git clone https://github.com/KarthikSubramanian07/Count-Ludo.git
@@ -83,6 +85,10 @@ Count Ludo has no ads and never will, so there is no revenue to speak of and the
 ## Contributing
 
 Bug reports and pull requests are welcome. If you found a rules edge case that behaves wrong, an issue with a short description of the roll sequence is gold. Run `npm run check` before opening a PR and it should stay green.
+
+## Security
+
+No server, no database, no accounts, no user data. See [SECURITY.md](SECURITY.md) for what's in scope and how to report something privately if you find it.
 
 ## License
 

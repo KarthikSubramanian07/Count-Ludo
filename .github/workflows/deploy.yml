@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: env.HAS_CREDENTIALS == 'true'
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci

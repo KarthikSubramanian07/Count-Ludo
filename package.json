@@ -6,6 +6,9 @@
   "description": "Clean, minimal, browser-based Ludo. Play free vs AI or local friends. No ads, no signup.",
   "license": "MIT",
   "homepage": "https://github.com/KarthikSubramanian07/Count-Ludo",
+  "engines": {
+    "node": ">=22"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/KarthikSubramanian07/Count-Ludo.git"
@@ -33,6 +36,7 @@
     "typescript-eslint": "^8.24.0",
     "vite": "^6.1.0",
     "vite-plugin-pwa": "^0.21.1",
-    "vitest": "^3.0.5"
+    "vitest": "^3.0.5",
+    "wrangler": "^4.118.0"
   }
 }
