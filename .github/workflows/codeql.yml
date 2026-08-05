@@ -1,0 +1,30 @@
+name: CodeQL
+
+# Static security analysis for a public repo: scans the TypeScript source on
+# every push/PR to main and on a weekly schedule, so newly-disclosed
+# vulnerability patterns get caught even on weeks nobody touches the code.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+
+      - uses: github/codeql-action/analyze@v3
