@@ -7,6 +7,11 @@ name: Deploy to Cloudflare Pages
 #   CLOUDFLARE_API_TOKEN    a token with the "Cloudflare Pages: Edit" permission
 #   CLOUDFLARE_ACCOUNT_ID   your account id, from the Cloudflare dashboard URL
 #
+# A bad or expired token intentionally does NOT fail this workflow (see
+# continue-on-error below): it's flagged loudly in the run log instead, so an
+# expired secret can't turn CI red on every future push. If the deploy step
+# reports "failed (soft)", rotate the token.
+#
 # Prefer no CI at all? `npm run deploy` from your machine after `npx wrangler
 # login` does the same thing.
 
@@ -37,7 +42,9 @@ jobs:
         if: env.HAS_CREDENTIALS == 'true'
 
       - name: Publish to Cloudflare Pages
+        id: deploy
         if: env.HAS_CREDENTIALS == 'true'
+        continue-on-error: true
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -47,3 +54,9 @@ jobs:
       - name: Note when skipped
         if: env.HAS_CREDENTIALS != 'true'
         run: echo "Cloudflare secrets not set; skipping deploy. See this file's header to enable."
+
+      - name: Flag a bad token instead of failing the build
+        if: env.HAS_CREDENTIALS == 'true' && steps.deploy.outcome == 'failure'
+        run: |
+          echo "::warning::Cloudflare deploy step failed, most likely CLOUDFLARE_API_TOKEN is invalid or expired. Rotate it in Settings > Secrets and variables > Actions. The site itself is unaffected by this; it just didn't get this push's build."
+          exit 0
