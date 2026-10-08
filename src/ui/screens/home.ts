@@ -7,6 +7,7 @@ import type { Prefs, Stats } from '../storage.ts';
 import type { Theme } from '../theme.ts';
 import { h, clear, cap } from '../dom.ts';
 import { shareGame } from '../share.ts';
+import { FOOTER_LINKS } from '../../site/config.ts';
 
 export interface Seat {
   color: Color;
@@ -174,6 +175,11 @@ export function buildHome(ctx: HomeContext): HTMLElement {
           'Buy me a coffee'
         ),
         ', entirely optional, the game stays free either way.'
+      ),
+      h(
+        'nav',
+        { class: 'site-links', 'aria-label': 'Site' },
+        ...FOOTER_LINKS.map((l) => h('a', { href: l.href }, l.label))
       )
     )
   );

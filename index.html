@@ -20,6 +20,7 @@
     <link rel="canonical" href="https://count-ludo.pages.dev/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="alternate" type="text/markdown" href="/index.md" />
 
     <!-- iOS: proper standalone "Add to Home Screen" (Safari ignores the web
          manifest for this, it needs its own meta tags). -->
@@ -30,6 +31,7 @@
 
     <!-- Open Graph / social -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Count Ludo" />
     <meta
       property="og:title"
       content="Count Ludo - Play Ludo Online Free, No Ads"
@@ -54,39 +56,15 @@
       content="https://count-ludo.pages.dev/og-image.png"
     />
 
-    <!-- Structured data helps search engines understand this is a playable game -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "VideoGame",
-        "name": "Count Ludo",
-        "url": "https://count-ludo.pages.dev/",
-        "description": "Play Ludo online free. A clean, ad-free browser Ludo game against bots or local friends.",
-        "genre": ["Board game", "Strategy"],
-        "applicationCategory": "Game",
-        "operatingSystem": "Any (web browser)",
-        "playMode": ["SinglePlayer", "MultiPlayer"],
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-      }
-    </script>
+    <!-- Structured data (Organization, WebSite, SoftwareApplication) is
+         generated from src/site/content.ts by the build plugin. -->
+    <!--site:jsonld-->
   </head>
   <body>
-    <!-- Static first paint: real content for crawlers and instant load; the app
-         replaces it on boot. -->
+    <!-- Static first paint: real content for crawlers, agents and instant
+         load, generated from src/site/content.ts. The app replaces it on boot. -->
     <div id="app">
-      <main class="home">
-        <section class="hero">
-          <h1>Count Ludo</h1>
-          <p class="tagline">
-            Ludo, online and clean. Roll, race, win. No ads, no downloads.
-          </p>
-          <p class="lede">
-            Play Ludo online free, right in your browser, against smart bots or
-            friends passing one device. No signup, no installs, no nagging. Just
-            the classic race to get all four tokens home, the way it should be.
-          </p>
-        </section>
-      </main>
+      <!--site:home-->
     </div>
     <noscript>
       <p style="text-align: center; padding: 2rem">

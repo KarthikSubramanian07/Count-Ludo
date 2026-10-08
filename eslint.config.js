@@ -11,6 +11,7 @@ export default tseslint.config(
       'dev-dist',
       'coverage',
       'node_modules',
+      '.wrangler',
       '.github/skills',
       '.github/hooks',
     ],
