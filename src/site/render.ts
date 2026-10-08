@@ -92,16 +92,6 @@ export function pageMarkdown(page: Page): string {
   );
 }
 
-/** Visible text length of an HTML fragment, roughly what a crawler counts. */
-export function textLength(html: string): number {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/g, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&[a-z#0-9]+;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim().length;
-}
-
 export function footerNavHtml(): string {
   const links = FOOTER_LINKS.map(
     (l) => `<a href="${l.href}">${escapeHtml(l.label)}</a>`

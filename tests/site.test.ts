@@ -23,7 +23,6 @@ import {
   pageDocument,
   pageMarkdown,
   sitemapXml,
-  textLength,
 } from '../src/site/render.ts';
 import { routesJson, siteFiles, siteHtml } from '../src/site/plugin.ts';
 import { KEYS } from '../src/ui/storage.ts';
@@ -31,6 +30,34 @@ import { KEYS } from '../src/ui/storage.ts';
 const INDEX_HTML = siteHtml(
   readFileSync(new URL('../index.html', import.meta.url), 'utf8')
 );
+
+/**
+ * Visible text length of trusted, build-generated HTML, roughly what a
+ * crawler counts: markup and script contents are skipped, entities count as
+ * one space. A measuring stick for tests, not a sanitizer.
+ */
+function textLength(html: string): number {
+  const lower = html.toLowerCase();
+  let text = '';
+  let i = 0;
+  while (i < html.length) {
+    if (lower.startsWith('<script', i)) {
+      const close = lower.indexOf('</script', i);
+      i = close < 0 ? html.length : lower.indexOf('>', close) + 1;
+      text += ' ';
+    } else if (html[i] === '<') {
+      const close = html.indexOf('>', i);
+      i = close < 0 ? html.length : close + 1;
+      text += ' ';
+    } else {
+      text += html[i++];
+    }
+  }
+  return text
+    .replace(/&[a-z#0-9]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim().length;
+}
 
 function headingLevels(html: string): number[] {
   return [...html.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
@@ -40,6 +67,14 @@ function graphTypes(page = HOME): unknown[] {
   const graph = jsonLd(page)['@graph'] as Record<string, unknown>[];
   return graph.flatMap((n) => n['@type'] as string | string[]);
 }
+
+describe('textLength (test helper)', () => {
+  it('counts visible text only', () => {
+    expect(
+      textLength('<p>Hi <b>there</b></p><SCRIPT type="x">ignored</SCRIPT>&amp;')
+    ).toBe('Hi there'.length);
+  });
+});
 
 describe('inline rendering', () => {
   it('escapes HTML and turns Markdown links into anchors', () => {
