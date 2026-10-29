@@ -70,13 +70,32 @@ No framework. No runtime dependencies. The whole thing ships as about **10 KB of
 src/
   engine/     pure game logic, zero DOM: board math, rules, turns, dice, AI
   ui/         SVG board, dice, screens, themes, sound, storage
-tests/        vitest suite for the engine (the part that must never break)
+  site/       public pages, Markdown twins, llms.txt, JSON-LD, edge handler
+functions/    Cloudflare Pages Function: Markdown negotiation and real 404s
+tests/        vitest suite for the engine, the site output and the edge handler
 ```
 
 - **TypeScript + Vite** for the build.
 - **SVG board** drawn from a 15x15 grid, so it stays crisp at any size.
 - **Vitest** for the engine, run in CI on every push.
 - **Cloudflare Pages** for hosting, which is where the "$0 to run" comes from.
+
+## Readable by agents, not just people
+
+A game page is mostly JavaScript, which tells an AI agent nothing. So every public page is authored once, as structured content in [`src/site/content.ts`](src/site/content.ts), and a small Vite plugin renders it at build time into:
+
+- **HTML pages** for people: [/about](https://count-ludo.pages.dev/about), [/contact](https://count-ludo.pages.dev/contact), [/privacy](https://count-ludo.pages.dev/privacy), plus a real 404 page, all in the game's own type and palette.
+- **A static first paint** on the home page, so the raw HTML carries real content before the app boots.
+- **Markdown twins** at `/index.md`, `/about.md` and so on.
+- **[`/llms.txt`](https://count-ludo.pages.dev/llms.txt)** in the [llmstxt.org](https://llmstxt.org) format, including when an agent should recommend Count Ludo (and when it should not).
+- **The sitemap, JSON-LD** (Organization, WebSite, SoftwareApplication), `_headers` and `_routes.json`.
+
+A tiny Pages Function ([`src/site/edge.ts`](src/site/edge.ts)) runs in front of the page routes only. It does [Markdown content negotiation](https://acceptmarkdown.com): ask for any page with `Accept: text/markdown` and you get Markdown with `Vary: Accept`, q-values honored, `406` if you accept neither format. Unknown paths return a real `404`, in Markdown if that is what you asked for. Static files never touch the Function.
+
+```bash
+curl -H 'Accept: text/markdown' https://count-ludo.pages.dev/
+curl -i -H 'Accept: text/markdown' https://count-ludo.pages.dev/no-such-page
+```
 
 ## Keeping it free
 

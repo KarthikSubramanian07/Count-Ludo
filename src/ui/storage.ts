@@ -6,7 +6,7 @@ import type { GameState } from '../engine/types.ts';
 import { COLORS } from '../engine/types.ts';
 
 const PREFIX = 'count-ludo:';
-const KEYS = {
+export const KEYS = {
   prefs: `${PREFIX}prefs`,
   stats: `${PREFIX}stats`,
   save: `${PREFIX}save`,

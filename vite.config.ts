@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { countLudoSite } from './src/site/plugin.ts';
 
 // Count Ludo ships as a fully static site: zero backend, zero runtime deps.
 // The PWA plugin gives us installability + offline once the assets are cached.
@@ -13,6 +14,7 @@ export default defineConfig({
     reportCompressedSize: true,
   },
   plugins: [
+    countLudoSite(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt'],
@@ -38,6 +40,11 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globIgnores: ['404.html'],
+        // Only the game itself falls back to the cached shell offline. The
+        // information pages are precached under their own URLs, and unknown
+        // paths must reach the network so they get a real 404.
+        navigateFallbackAllowlist: [/^\/(?:\?.*)?$/],
       },
     }),
   ],
@@ -46,7 +53,7 @@ export default defineConfig({
     include: ['tests/**/*.test.ts'],
     coverage: {
       provider: 'v8',
-      include: ['src/engine/**/*.ts'],
+      include: ['src/engine/**/*.ts', 'src/site/**/*.ts'],
       reporter: ['text', 'html'],
     },
   },

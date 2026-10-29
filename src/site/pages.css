@@ -1,0 +1,133 @@
+/* Information pages (about, contact, privacy, 404). These are plain static
+   HTML with no app bundle, so the theme variables are written into this file
+   at build time from src/ui/theme.ts: same palette, same serif/sans pairing,
+   same warm clay accent as the game. */
+
+:root {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --radius-sm: 10px;
+  --maxw: 720px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.15em;
+}
+
+.page-top {
+  max-width: var(--maxw);
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.btn {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.prose {
+  max-width: var(--maxw);
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1.1rem 3rem;
+  flex: 1;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.prose h1 {
+  font-size: clamp(2.25rem, 5vw + 1rem, 3.25rem);
+  letter-spacing: -0.01em;
+  margin: 1rem 0 1.2rem;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  margin: 2.4rem 0 0.8rem;
+}
+
+.prose h3 {
+  font-size: 1.125rem;
+  margin: 1.6rem 0 0.5rem;
+}
+
+.prose p,
+.prose li {
+  max-width: 65ch;
+  text-wrap: pretty;
+}
+
+.prose > p:first-of-type {
+  font-size: 1.125rem;
+}
+
+.prose li + li {
+  margin-top: 0.4rem;
+}
+
+.page-footer {
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 1.6rem 1.1rem 2.4rem;
+}
+
+.site-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  font-weight: 600;
+}
+
+.site-links a {
+  text-decoration: none;
+}
+
+.site-links a:hover {
+  text-decoration: underline;
+}

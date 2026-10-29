@@ -386,6 +386,41 @@ button {
   text-decoration: underline;
 }
 
+/* Site links (About, Privacy, Contact) under the home footer. */
+.site-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  margin-top: 0.4rem;
+}
+.site-links a {
+  color: var(--text-dim);
+  font-weight: 600;
+  text-decoration: none;
+}
+.site-links a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Landing copy in the static first paint (the HTML crawlers and agents read
+   before the app boots and swaps in the setup card). */
+.home-info {
+  color: var(--text-dim);
+  max-width: 60ch;
+}
+.home-info h2 {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+  margin: 1.2rem 0 0.5rem;
+}
+.home-info a {
+  color: var(--accent);
+}
+
 /* ---- Color dots (shared) ------------------------------------------------ */
 
 .dot {
