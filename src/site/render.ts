@@ -104,7 +104,8 @@ export function homeShellHtml(page: Page): string {
   const [tagline, ...rest] = page.intro;
   const taglineText = tagline && 'p' in tagline ? tagline.p : '';
   return [
-    '<main class="home">',
+    '<a class="skip-link" href="#main-content">Skip to content</a>',
+    '<main class="home" id="main-content">',
     '<section class="hero">',
     `<h1>${escapeHtml(page.h1)}</h1>`,
     `<p class="tagline">${inlineHtml(taglineText)}</p>`,
@@ -251,11 +252,12 @@ ${robots}
 ${jsonLdScript(page)}
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <header class="page-top">
 <a class="brand" href="/">${SITE.name}</a>
 <a class="btn btn-primary" href="/">Play now</a>
 </header>
-<main class="prose">
+<main class="prose" id="main-content">
 <h1>${escapeHtml(page.h1)}</h1>
 ${pageBodyHtml(page)}
 </main>
