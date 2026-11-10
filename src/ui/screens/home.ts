@@ -57,14 +57,22 @@ export function buildHome(ctx: HomeContext): HTMLElement {
     ...[2, 3, 4].map((n) => {
       const b = h(
         'button',
-        { class: 'seg-btn' + (n === count ? ' active' : ''), type: 'button' },
+        {
+          class: 'seg-btn' + (n === count ? ' active' : ''),
+          type: 'button',
+          'aria-pressed': n === count ? 'true' : 'false',
+        },
         `${n} players`
       );
       b.onclick = () => {
         count = n;
         seats = defaultSeats(count);
-        for (const el of countPicker.children) el.classList.remove('active');
+        for (const el of countPicker.children) {
+          el.classList.remove('active');
+          el.setAttribute('aria-pressed', 'false');
+        }
         b.classList.add('active');
+        b.setAttribute('aria-pressed', 'true');
         renderSeats();
       };
       return b;
@@ -216,15 +224,19 @@ function seatRow(seat: Seat, index: number, onChange: () => void): HTMLElement {
   }
   diff.onchange = () => (seat.difficulty = diff.value as Difficulty);
 
+  const seatLabel = seat.isHuman
+    ? `${seatHumanName(index)} (${cap(seat.color)})`
+    : `${cap(seat.color)} bot`;
+
   return h(
     'div',
     { class: 'seat' },
-    h('span', { class: `dot dot-${seat.color}` }),
-    h(
-      'span',
-      { class: 'seat-name' },
-      seat.isHuman ? seatHumanName(index) : `${cap(seat.color)} bot`
-    ),
+    h('span', {
+      class: `dot dot-${seat.color}`,
+      'aria-hidden': 'true',
+      title: cap(seat.color),
+    }),
+    h('span', { class: 'seat-name' }, seatLabel),
     h(
       'div',
       { class: 'seat-controls' },
@@ -236,19 +248,24 @@ function seatRow(seat: Seat, index: number, onChange: () => void): HTMLElement {
 }
 
 function themeSwatch(theme: Theme, ctx: HomeContext): HTMLElement {
+  const selected = theme.id === ctx.prefs.theme;
   const btn = h('button', {
-    class: 'swatch' + (theme.id === ctx.prefs.theme ? ' active' : ''),
+    class: 'swatch' + (selected ? ' active' : ''),
     type: 'button',
     'aria-label': `Theme: ${theme.label}`,
+    'aria-pressed': selected ? 'true' : 'false',
     title: theme.label,
     style: `background:${theme.swatch}`,
   });
   btn.onclick = () => {
     ctx.prefs.theme = theme.id;
     ctx.onThemeChange(theme.id);
-    for (const el of btn.parentElement?.children ?? [])
+    for (const el of btn.parentElement?.children ?? []) {
       el.classList.remove('active');
+      el.setAttribute('aria-pressed', 'false');
+    }
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
   };
   return btn;
 }

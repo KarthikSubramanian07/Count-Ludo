@@ -51,9 +51,21 @@ export function buildWin(ctx: WinContext): HTMLElement {
           h(
             'li',
             { class: 'rank-row' },
-            h('span', { class: 'medal' }, MEDALS[i] ?? `${i + 1}th`),
-            h('span', { class: `dot dot-${color}` }),
-            h('span', { class: 'rank-name' }, nameOf(color)),
+            h(
+              'span',
+              { class: 'medal', 'aria-hidden': 'true' },
+              MEDALS[i] ?? `${i + 1}th`
+            ),
+            h('span', {
+              class: `dot dot-${color}`,
+              'aria-hidden': 'true',
+              title: cap(color),
+            }),
+            h(
+              'span',
+              { class: 'rank-name' },
+              `${nameOf(color)} (${cap(color)})`
+            ),
             ctx.humanColors.has(color)
               ? h('span', { class: 'you-tag' }, 'you')
               : null

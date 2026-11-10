@@ -28,10 +28,11 @@ export class BoardView {
   private readonly tokenEls = new Map<string, SVGGElement>();
 
   constructor() {
+    // role=group (not img) so movable tokens remain in the accessibility tree.
     this.el = s('svg', {
       viewBox: '0 0 15 15',
       class: 'board',
-      role: 'img',
+      role: 'group',
       'aria-label': 'Ludo board',
     }) as SVGSVGElement;
     this.el.append(this.buildStaticBoard());
@@ -192,14 +193,33 @@ export class BoardView {
       const { x, y } = cellCenter([row + offset.dy, col + offset.dx]);
       g.setAttribute('transform', `translate(${x} ${y})`);
 
-      const isMovable = movable.has(key) && onPick;
-      g.classList.toggle('movable', Boolean(isMovable));
+      const move = movable.get(key);
+      const isMovable = Boolean(move && onPick);
+      g.classList.toggle('movable', isMovable);
       g.classList.toggle(
         'current',
         state.players[state.current]!.color === t.color
       );
-      g.onclick = isMovable ? () => onPick!(t) : null;
-      g.style.cursor = isMovable ? 'pointer' : '';
+      const label = tokenLabel(t, move);
+      g.setAttribute('aria-label', label);
+      if (isMovable) {
+        g.setAttribute('role', 'button');
+        g.setAttribute('tabindex', '0');
+        g.onclick = () => onPick!(t);
+        g.onkeydown = (ev: KeyboardEvent) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            onPick!(t);
+          }
+        };
+        g.style.cursor = 'pointer';
+      } else {
+        g.setAttribute('role', 'img');
+        g.removeAttribute('tabindex');
+        g.onclick = null;
+        g.onkeydown = null;
+        g.style.cursor = '';
+      }
     }
   }
 
@@ -225,6 +245,26 @@ export class BoardView {
 
 function keyOf(token: Token): string {
   return `${token.color}-${token.index}`;
+}
+
+function tokenLabel(token: Token, move: Move | undefined): string {
+  const name = `${capColor(token.color)} token ${token.index + 1}`;
+  if (!move) {
+    if (token.state === 'base') return `${name}, in base`;
+    if (token.state === 'home') return `${name}, home`;
+    return name;
+  }
+  if (move.leavesBase) return `Move ${name} onto the board`;
+  if (move.finishes) return `Move ${name} home`;
+  const capture =
+    move.captures.length > 0
+      ? `, capturing ${move.captures.map(capColor).join(' and ')}`
+      : '';
+  return `Move ${name}${capture}`;
+}
+
+function capColor(color: Color): string {
+  return color.charAt(0).toUpperCase() + color.slice(1);
 }
 
 /** Small radial fan so N tokens on one cell stay individually visible. */
