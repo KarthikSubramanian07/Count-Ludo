@@ -43,6 +43,10 @@ body {
   padding: 0;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -51,9 +55,31 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;
+  overflow-x: clip;
   transition:
     background 0.3s ease,
     color 0.3s ease;
+}
+
+/* Skip link: off-screen until focused so keyboard users can jump past chrome. */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 1000;
+  padding: 0.55rem 0.9rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transform: translateY(-200%);
+  transition: transform 0.15s var(--ease-out);
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 #app {
@@ -222,19 +248,24 @@ button {
 .seat {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.7rem;
   padding: 0.6rem 0.8rem;
   background: var(--surface-2);
   border-radius: var(--radius-sm);
+  min-width: 0;
 }
 .seat-name {
-  flex: 1;
+  flex: 1 1 auto;
   font-weight: 600;
+  min-width: 0;
 }
 .seat-controls {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.4rem;
+  max-width: 100%;
 }
 .chip {
   border: 1px solid var(--border);
@@ -348,7 +379,7 @@ button {
 
 .stats-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.6rem;
 }
 .stat {
@@ -374,7 +405,7 @@ button {
   text-align: center;
 }
 .home-footer .muted {
-  opacity: 0.75;
+  /* Keep solid --text-dim (already AA); opacity would drop contrast below 4.5:1. */
   font-size: var(--text-xs);
 }
 .coffee-link {
@@ -646,19 +677,56 @@ Piece motion settles with a plain ease-out: no spring, no overshoot. */
   fill: var(--blue);
 }
 
+/* Static highlight (not an infinite animation) so movable tokens stay clear
+   without needing a pause control for continuous motion (WCAG 2.2.2). */
 .token.movable .token-body {
-  animation: token-pulse 1.1s ease-in-out infinite;
+  stroke: rgba(255, 255, 255, 1);
+  stroke-width: 0.11;
+  filter: drop-shadow(0 0 0.08px rgba(0, 0, 0, 0.45));
 }
-@keyframes token-pulse {
-  0%,
-  100% {
-    stroke: rgba(255, 255, 255, 0.9);
-    stroke-width: 0.04;
-  }
-  50% {
-    stroke: rgba(255, 255, 255, 1);
-    stroke-width: 0.11;
-  }
+.token.movable:focus {
+  outline: none;
+}
+.token.movable:focus .token-body {
+  stroke: var(--accent);
+  stroke-width: 0.14;
+}
+
+/* ---- Move picker (keyboard / screen-reader path onto the board) --------- */
+
+.move-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  width: 100%;
+}
+.move-picker[hidden] {
+  display: none !important;
+}
+.move-picker-btn {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  min-height: 44px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.move-picker-btn:hover {
+  border-color: var(--accent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---- Fairness panel ----------------------------------------------------- */
@@ -668,6 +736,33 @@ Piece motion settles with a plain ease-out: no spring, no overshoot. */
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1rem 1.1rem;
+}
+.fairness-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 12, 0.45);
+  z-index: 40;
+}
+.fairness-dialog {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  width: min(420px, calc(100vw - 1.5rem));
+  max-height: min(80dvh, 560px);
+  overflow: auto;
+  box-shadow: var(--shadow);
+}
+.fairness-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+.fairness-head h2 {
+  margin: 0;
 }
 .fairness h2 {
   font-family: var(--font-serif);
@@ -785,11 +880,28 @@ Piece motion settles with a plain ease-out: no spring, no overshoot. */
   }
 }
 
+@media (max-width: 360px) {
+  .stats-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .seg {
+    width: 100%;
+  }
+  .seg-btn {
+    flex: 1 1 auto;
+    padding: 0.6rem 0.55rem;
+  }
+  .chip {
+    padding: 0.55rem 0.7rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .token,
   .die.rolling,
   .confetti,
-  .token.movable .token-body {
+  .token.movable .token-body,
+  .skip-link {
     animation: none !important;
     transition: none !important;
   }

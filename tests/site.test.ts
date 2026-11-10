@@ -117,7 +117,7 @@ describe('homepage HTML without JavaScript', () => {
 
   it('keeps the hero markup the app boots into', () => {
     expect(homeShellHtml(HOME)).toMatch(
-      /<main class="home">\n<section class="hero">\n<h1>Count Ludo<\/h1>\n<p class="tagline">/
+      /<a class="skip-link" href="#main-content">Skip to content<\/a>\n<main class="home" id="main-content">\n<section class="hero">\n<h1>Count Ludo<\/h1>\n<p class="tagline">/
     );
   });
 

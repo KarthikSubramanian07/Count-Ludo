@@ -62,9 +62,18 @@ export class App {
   // Live references on the game screen, updated in place.
   private turnLabel!: HTMLElement;
   private messageEl!: HTMLElement;
+  private statusLive!: HTMLElement;
   private rollBtn!: HTMLButtonElement;
+  private pauseBtn!: HTMLButtonElement;
+  private movePicker!: HTMLElement;
   private logList!: HTMLElement;
   private fairnessPanel!: HTMLElement;
+  private fairnessBackdrop!: HTMLElement;
+  private fairnessCloseBtn!: HTMLButtonElement;
+  private fairnessReturnFocus: HTMLElement | null = null;
+  private fairnessKeyHandler: ((ev: KeyboardEvent) => void) | null = null;
+  /** When true, bot turns wait until the player resumes. */
+  private paused = false;
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -81,19 +90,20 @@ export class App {
   // ---- Screen: Home -------------------------------------------------------
 
   private showHome(): void {
+    this.teardownFairness();
     clear(this.root);
     const hasSave = Boolean(loadSave());
-    this.root.append(
-      buildHome({
-        prefs: this.prefs,
-        stats: this.stats,
-        themes: THEMES,
-        hasSave,
-        onThemeChange: (id) => this.setTheme(id),
-        onStart: (setup) => this.startGame(setup),
-        onResume: () => this.resumeGame(),
-      })
-    );
+    const home = buildHome({
+      prefs: this.prefs,
+      stats: this.stats,
+      themes: THEMES,
+      hasSave,
+      onThemeChange: (id) => this.setTheme(id),
+      onStart: (setup) => this.startGame(setup),
+      onResume: () => this.resumeGame(),
+    });
+    home.id = 'main-content';
+    this.root.append(skipLink(), home);
   }
 
   private setTheme(id: string): void {
@@ -107,6 +117,7 @@ export class App {
   private startGame(setup: SetupState): void {
     this.generation++;
     this.busy = false;
+    this.paused = false;
     this.prefs = { ...this.prefs, blocking: setup.blocking };
     savePrefs(this.prefs);
 
@@ -143,6 +154,7 @@ export class App {
     }
     this.generation++;
     this.busy = false;
+    this.paused = false;
     this.game = LudoGame.fromState(saved.state);
     this.humanColors = new Set(
       saved.state.players.filter((p) => p.isHuman).map((p) => p.color)
@@ -155,21 +167,65 @@ export class App {
   // ---- Screen: Game -------------------------------------------------------
 
   private showGame(): void {
+    this.teardownFairness();
     clear(this.root);
 
-    this.turnLabel = h('div', { class: 'turn-label' });
-    this.messageEl = h('div', { class: 'message', 'aria-live': 'polite' });
+    this.turnLabel = h('div', { class: 'turn-label', id: 'turn-label' });
+    this.messageEl = h('div', { class: 'message' });
+    this.statusLive = h('div', {
+      class: 'sr-only',
+      'aria-live': 'polite',
+      'aria-atomic': 'true',
+    });
     this.rollBtn = h(
       'button',
       { class: 'btn btn-roll', type: 'button' },
       'Roll'
     ) as HTMLButtonElement;
     this.rollBtn.onclick = () => this.onRollClick();
+    this.pauseBtn = h(
+      'button',
+      {
+        class: 'btn btn-ghost',
+        type: 'button',
+        'aria-pressed': 'false',
+      },
+      'Pause'
+    ) as HTMLButtonElement;
+    this.pauseBtn.onclick = () => this.togglePause();
+    this.movePicker = h('div', {
+      class: 'move-picker',
+      role: 'group',
+      'aria-label': 'Legal moves',
+      hidden: true,
+    });
     this.logList = h('ol', { class: 'log-list' });
+    this.fairnessCloseBtn = h(
+      'button',
+      { class: 'icon-btn', type: 'button', 'aria-label': 'Close roll log' },
+      '×'
+    ) as HTMLButtonElement;
+    this.fairnessCloseBtn.onclick = () => this.closeFairness();
+    this.fairnessBackdrop = h('div', {
+      class: 'fairness-backdrop',
+      hidden: true,
+    });
+    this.fairnessBackdrop.onclick = () => this.closeFairness();
     this.fairnessPanel = h(
-      'aside',
-      { class: 'fairness', hidden: true },
-      h('h2', {}, 'Roll log'),
+      'div',
+      {
+        class: 'fairness fairness-dialog',
+        role: 'dialog',
+        'aria-modal': 'true',
+        'aria-labelledby': 'fairness-title',
+        hidden: true,
+      },
+      h(
+        'div',
+        { class: 'fairness-head' },
+        h('h2', { id: 'fairness-title' }, 'Roll log'),
+        this.fairnessCloseBtn
+      ),
       h(
         'p',
         { class: 'fairness-note' },
@@ -180,6 +236,10 @@ export class App {
       this.logList
     );
 
+    const fairnessBtn = iconBtn('⚖', 'Fairness and roll log', () =>
+      this.openFairness(fairnessBtn)
+    );
+
     const header = h(
       'header',
       { class: 'game-header' },
@@ -188,7 +248,7 @@ export class App {
       h(
         'div',
         { class: 'header-tools' },
-        iconBtn('⚖', 'Fairness and roll log', () => this.toggleFairness()),
+        fairnessBtn,
         this.soundBtn(),
         this.themeBtn()
       )
@@ -200,18 +260,23 @@ export class App {
       this.turnLabel,
       h('div', { class: 'die-wrap' }, this.die.el),
       this.rollBtn,
-      this.messageEl
+      this.pauseBtn,
+      this.messageEl,
+      this.movePicker
     );
 
     this.root.append(
+      skipLink(),
+      this.statusLive,
       h(
         'div',
-        { class: 'game-screen' },
+        { class: 'game-screen', id: 'main-content' },
         header,
         h('div', { class: 'board-wrap' }, this.board.el),
-        panel,
-        this.fairnessPanel
-      )
+        panel
+      ),
+      this.fairnessBackdrop,
+      this.fairnessPanel
     );
     this.renderLog();
   }
@@ -238,8 +303,71 @@ export class App {
     });
   }
 
-  private toggleFairness(): void {
-    this.fairnessPanel.hidden = !this.fairnessPanel.hidden;
+  private openFairness(returnFocus: HTMLElement): void {
+    if (!this.fairnessPanel.hidden) return;
+    this.fairnessReturnFocus = returnFocus;
+    this.fairnessPanel.hidden = false;
+    this.fairnessBackdrop.hidden = false;
+    this.fairnessKeyHandler = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        this.closeFairness();
+        return;
+      }
+      if (ev.key !== 'Tab') return;
+      const focusable = this.fairnessFocusable();
+      if (focusable.length === 0) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      if (ev.shiftKey && document.activeElement === first) {
+        ev.preventDefault();
+        last.focus();
+      } else if (!ev.shiftKey && document.activeElement === last) {
+        ev.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', this.fairnessKeyHandler);
+    this.fairnessCloseBtn.focus();
+  }
+
+  private closeFairness(): void {
+    if (this.fairnessPanel.hidden) return;
+    this.fairnessPanel.hidden = true;
+    this.fairnessBackdrop.hidden = true;
+    if (this.fairnessKeyHandler) {
+      document.removeEventListener('keydown', this.fairnessKeyHandler);
+      this.fairnessKeyHandler = null;
+    }
+    const back = this.fairnessReturnFocus;
+    this.fairnessReturnFocus = null;
+    back?.focus();
+  }
+
+  private teardownFairness(): void {
+    if (this.fairnessKeyHandler) {
+      document.removeEventListener('keydown', this.fairnessKeyHandler);
+      this.fairnessKeyHandler = null;
+    }
+    this.fairnessReturnFocus = null;
+  }
+
+  private fairnessFocusable(): HTMLElement[] {
+    return [
+      ...this.fairnessPanel.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ),
+    ].filter((el) => !el.hasAttribute('disabled') && el.tabIndex >= 0);
+  }
+
+  private togglePause(): void {
+    this.paused = !this.paused;
+    this.pauseBtn.textContent = this.paused ? 'Resume' : 'Pause';
+    this.pauseBtn.setAttribute('aria-pressed', this.paused ? 'true' : 'false');
+    this.announce(this.paused ? 'Game paused.' : 'Game resumed.');
+    if (!this.paused && this.game && !this.game.current.isHuman && !this.busy) {
+      this.after(BOT_THINK_MS, () => void this.doRoll());
+    }
   }
 
   private confirmLeave(): void {
@@ -248,7 +376,9 @@ export class App {
     // we're leaving can never act on whatever we do next.
     this.generation++;
     this.busy = false;
+    this.paused = false;
     this.game = null;
+    this.teardownFairness();
     this.showHome();
   }
 
@@ -274,7 +404,7 @@ export class App {
     this.rollBtn.disabled = !human;
     this.rollBtn.hidden = !human;
 
-    if (!human) {
+    if (!human && !this.paused) {
       this.after(BOT_THINK_MS, () => void this.doRoll());
     }
   }
@@ -287,20 +417,23 @@ export class App {
 
   private async doRoll(): Promise<void> {
     const game = this.game;
-    if (!game || this.busy) return;
+    if (!game || this.busy || this.paused) return;
     this.busy = true;
     this.rollBtn.disabled = true;
+    this.clearMovePicker();
 
     const player = game.current;
     const result = game.roll();
     this.sound.play('roll');
     await this.die.animateRoll(result.die);
     writeSave(game.state);
+    this.announce(`${player.name} rolled ${result.die}.`);
 
     if (result.outcome === 'awaiting-move') {
       this.log(player.color, result.die, 'to move');
       if (player.isHuman) {
         this.renderBoard(result.moves, true);
+        this.renderMovePicker(result.moves);
         this.busy = false;
         if (result.moves.length === 1) {
           const only = result.moves[0]!;
@@ -308,7 +441,9 @@ export class App {
         }
       } else {
         const move = chooseMove(game.state, result.moves, player.difficulty);
-        this.after(BOT_THINK_MS, () => void this.doMove(move.token));
+        this.after(BOT_THINK_MS, () => {
+          if (!this.paused) void this.doMove(move.token);
+        });
       }
       return;
     }
@@ -340,6 +475,7 @@ export class App {
     );
     if (!move) return;
     this.busy = true;
+    this.clearMovePicker();
 
     const result = game.play(move as Move);
     this.renderBoard([], false);
@@ -360,6 +496,12 @@ export class App {
         `${cap(token.color)} captured ${result.captured
           .map((t) => cap(t.color))
           .join(', ')}!`
+      );
+    } else if (move.finishes) {
+      this.flash(`${cap(token.color)} token ${token.index + 1} reached home.`);
+    } else if (move.leavesBase) {
+      this.flash(
+        `${cap(token.color)} token ${token.index + 1} entered the board.`
       );
     }
     // Never persist a finished game: a save is only ever meant to resume a
@@ -396,24 +538,69 @@ export class App {
     const game = this.game;
     if (!game) return;
     const player = game.current;
+    const turnText = player.isHuman
+      ? player.name === 'You'
+        ? 'Your turn'
+        : `${player.name}'s turn`
+      : this.paused
+        ? `${player.name} waiting (paused)`
+        : `${player.name} thinking…`;
     clear(this.turnLabel);
     this.turnLabel.append(
-      h('span', { class: `dot dot-${player.color}` }),
-      h(
-        'span',
-        {},
-        player.isHuman
-          ? player.name === 'You'
-            ? 'Your turn'
-            : `${player.name}'s turn`
-          : `${player.name} thinking…`
-      )
+      h('span', {
+        class: `dot dot-${player.color}`,
+        'aria-hidden': 'true',
+        title: cap(player.color),
+      }),
+      h('span', {}, `${turnText} · ${cap(player.color)}`)
     );
     this.die.show(game.state.die);
+    this.announce(turnText);
   }
 
   private flash(text: string): void {
     this.messageEl.textContent = text;
+    this.announce(text);
+  }
+
+  private announce(text: string): void {
+    if (!this.statusLive) return;
+    // Clear then set so identical consecutive messages are still announced.
+    this.statusLive.textContent = '';
+    window.setTimeout(() => {
+      if (this.statusLive) this.statusLive.textContent = text;
+    }, 30);
+  }
+
+  private renderMovePicker(moves: readonly Move[]): void {
+    clear(this.movePicker);
+    if (moves.length === 0) {
+      this.movePicker.hidden = true;
+      return;
+    }
+    this.movePicker.hidden = false;
+    for (const move of moves) {
+      const t = move.token;
+      let label = `${cap(t.color)} token ${t.index + 1}`;
+      if (move.leavesBase) label += ' onto the board';
+      else if (move.finishes) label += ' home';
+      if (move.captures.length > 0) {
+        label += ` (capture ${move.captures.map(cap).join(', ')})`;
+      }
+      const btn = h(
+        'button',
+        { class: 'move-picker-btn', type: 'button' },
+        label
+      );
+      btn.onclick = () => this.onTokenPick(t);
+      this.movePicker.append(btn);
+    }
+  }
+
+  private clearMovePicker(): void {
+    if (!this.movePicker) return;
+    clear(this.movePicker);
+    this.movePicker.hidden = true;
   }
 
   private log(color: Color, value: number, note: string): void {
@@ -444,6 +631,7 @@ export class App {
     if (!game) return;
     clearSave();
     this.sound.play('win');
+    this.teardownFairness();
 
     const winner = game.state.ranking[0];
     const humanWon = winner ? this.humanColors.has(winner) : false;
@@ -457,16 +645,35 @@ export class App {
     };
     saveStats(this.stats);
 
+    const winnerName =
+      game.state.players.find((p) => p.color === winner)?.name ??
+      (winner ? cap(winner) : 'Someone');
     clear(this.root);
+    const win = buildWin({
+      ranking: game.state.ranking,
+      players: game.state.players,
+      humanColors: this.humanColors,
+      onPlayAgain: () => this.showHome(),
+    });
+    win.id = 'main-content';
     this.root.append(
-      buildWin({
-        ranking: game.state.ranking,
-        players: game.state.players,
-        humanColors: this.humanColors,
-        onPlayAgain: () => this.showHome(),
-      })
+      skipLink(),
+      h(
+        'div',
+        { class: 'sr-only', 'aria-live': 'assertive', 'aria-atomic': 'true' },
+        humanWon ? 'You win!' : `${winnerName} wins.`
+      ),
+      win
     );
   }
+}
+
+function skipLink(): HTMLElement {
+  return h(
+    'a',
+    { class: 'skip-link', href: '#main-content' },
+    'Skip to content'
+  );
 }
 
 function iconBtn(
