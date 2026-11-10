@@ -15,6 +15,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -25,6 +29,26 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow-x: clip;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 1000;
+  padding: 0.55rem 0.9rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 a {
@@ -98,6 +122,17 @@ a {
 .prose li {
   max-width: 65ch;
   text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.prose a {
+  overflow-wrap: anywhere;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .prose > p:first-of-type {
